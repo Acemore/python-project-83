@@ -21,6 +21,7 @@ def get_url_id_by_url_name(conn, url_name):
         else:
             curs.execute('INSERT INTO urls (name) VALUES (%s) RETURNING id', (url_name,))
             id, = curs.fetchone()
+            conn.commit()
             flash('Страница успешно добавлена', 'success')
 
     return id
