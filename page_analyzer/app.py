@@ -5,8 +5,12 @@ from flask import (
     Flask, flash, get_flashed_messages, redirect,
     render_template, request, url_for,
 )
+from itertools import zip_longest
 
-from .db import get_url_by_id, get_url_id_by_url_name, get_urls
+from .db import (
+    check_url, get_last_url_check_date, get_url_by_id,
+    get_url_checks_by_url_id, get_url_id_by_url_name, get_urls,
+)
 from .urls import normalize_url, validate
 
 load_dotenv()
@@ -32,10 +36,11 @@ def index():
 @app.get('/urls')
 def urls_show():
     urls = get_urls(conn)
+    last_url_check_dates = [get_last_url_check_date(conn, url) for url in urls] 
 
     return render_template(
         'urls/index.html',
-        urls=urls,
+        data=zip_longest(urls, last_url_check_dates),
     )
 
 
@@ -65,5 +70,16 @@ def get_url_details(id):
     return render_template(
         'urls/url.html',
         url=get_url_by_id(conn, id),
+        url_checks=get_url_checks_by_url_id(conn, id),
         messages=get_flashed_messages(with_categories=True),
     )
+
+
+@app.post('/urls/<int:id>/checks')
+def post_url_check(id):
+    url = get_url_by_id(conn, id)
+
+    check_url(conn, url)
+    flash('Страница успешно проверена', 'success')
+
+    return redirect(url_for('get_url_details', id=id))
