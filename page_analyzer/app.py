@@ -36,7 +36,7 @@ def index():
 @app.get('/urls')
 def urls_show():
     urls = get_urls(conn)
-    last_url_check_dates = [get_last_url_check_date(conn, url) for url in urls] 
+    last_url_check_dates = [get_last_url_check_date(conn, url) for url in urls]
 
     return render_template(
         'urls/index.html',

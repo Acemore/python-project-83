@@ -49,6 +49,7 @@ def get_url_checks_by_url_id(conn, url_id):
 
     return url_checks
 
+
 def get_url_id_by_url_name(conn, url_name):
     with conn.cursor(cursor_factory=NamedTupleCursor) as curs:
         curs.execute(
