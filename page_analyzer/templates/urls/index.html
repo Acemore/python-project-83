@@ -1,0 +1,29 @@
+{% extends 'layout.html' %}
+
+{% block title %}
+  Сайты
+{% endblock %}
+
+{% block content %}
+  <div class="table-responsive">
+    <table class="table table-bordered table-hover text-nowrap" data-test="urls">
+      <tbody>
+        <tr>
+          <th>ID</th>
+          <th>Имя</th>
+          <!--<th>Последняя проверка</th>-->
+          <!--<th>Код ответа</th>-->
+        </tr>
+
+        {% for id, name, _ in urls %}
+          <tr>
+            <td>{{ id }}</td>
+            <td>
+              <a href="{{ url_for('get_url_details', id=id) }}">{{ name }}</a>
+            </td>    
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+{% endblock %}
