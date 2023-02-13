@@ -11,16 +11,21 @@
         <tr>
           <th>ID</th>
           <th>Имя</th>
-          <!--<th>Последняя проверка</th>-->
+          <th>Последняя проверка</th>
           <!--<th>Код ответа</th>-->
         </tr>
 
-        {% for id, name, _ in urls %}
+        {% for url, last_check_date in data %}
           <tr>
-            <td>{{ id }}</td>
+            <td>{{ url.id }}</td>
             <td>
-              <a href="{{ url_for('get_url_details', id=id) }}">{{ name }}</a>
-            </td>    
+              <a href="{{ url_for('get_url_details', id=url.id) }}">{{ url.name }}</a>
+            </td>
+            <td>
+              {% if last_check_date %}
+                {{ last_check_date }}
+              {% endif %}
+            </td>
           </tr>
         {% endfor %}
       </tbody>
