@@ -6,9 +6,11 @@ def get_tags_data(url_name):
     resp = requests.get(url_name)
     soup = BeautifulSoup(resp.text, 'html.parser')
 
-    h1 = soup.h1.text if soup.h1 else ''
-    title = soup.title.text if soup.title else ''
-    description = soup.find('meta', attrs={'name': 'description'}).get("content") if soup.find('meta', attrs={'name': 'description'}) else ''
+    h1 = h1_tag.text if (h1_tag := soup.h1) else ''
+    title = title_tag.text if (title_tag := soup.title) else ''
+    description = meta_tag.get('content') if (
+        meta_tag := soup.find('meta', attrs={'name': 'description'})
+    ) else ''
 
     tags_data = {
         'h1': h1,
