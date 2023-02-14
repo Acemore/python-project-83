@@ -13,17 +13,18 @@ def check_url(conn, url, status_code):
         conn.commit()
 
 
-def get_last_url_check_date(conn, url):
+def get_last_url_check(conn, url):
     with conn.cursor(cursor_factory=NamedTupleCursor) as curs:
         curs.execute(
-            'SELECT MAX(created_at)\
+            'SELECT *\
             FROM url_checks\
-            WHERE url_id = %s;',
+            WHERE url_id = %s\
+            ORDER BY id DESC;',
             (url.id,),
         )
-        last_check_date, = curs.fetchone()
+        last_check = curs.fetchone()
 
-    return last_check_date
+    return last_check
 
 
 def get_status_code_by_url_name(url_name):

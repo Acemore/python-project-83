@@ -8,7 +8,7 @@ from flask import (
 from itertools import zip_longest
 
 from .db import (
-    check_url, get_last_url_check_date, get_status_code_by_url_name,
+    check_url, get_last_url_check, get_status_code_by_url_name,
     get_url_by_id, get_url_checks_by_url_id,
     get_url_id_by_url_name, get_urls,
 )
@@ -37,11 +37,11 @@ def index():
 @app.get('/urls')
 def urls_show():
     urls = get_urls(conn)
-    last_url_check_dates = [get_last_url_check_date(conn, url) for url in urls]
-
+    last_url_checks = [get_last_url_check(conn, url) for url in urls]
+    
     return render_template(
         'urls/index.html',
-        data=zip_longest(urls, last_url_check_dates),
+        data=zip_longest(urls, last_url_checks),
     )
 
 
@@ -69,11 +69,11 @@ def post_url():
 @app.get('/urls/<int:id>')
 def get_url_details(id):
     url = get_url_by_id(conn, id)
+
     return render_template(
         'urls/url.html',
         url=url,
         url_checks=get_url_checks_by_url_id(conn, id),
-        status_code=get_status_code_by_url_name(url.name),
         messages=get_flashed_messages(with_categories=True),
     )
 

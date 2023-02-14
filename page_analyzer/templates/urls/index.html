@@ -12,18 +12,23 @@
           <th>ID</th>
           <th>Имя</th>
           <th>Последняя проверка</th>
-          <!--<th>Код ответа</th>-->
+          <th>Код ответа</th>
         </tr>
 
-        {% for url, last_check_date in data %}
+        {% for url, last_url_check in data %}
           <tr>
             <td>{{ url.id }}</td>
             <td>
               <a href="{{ url_for('get_url_details', id=url.id) }}">{{ url.name }}</a>
             </td>
             <td>
-              {% if last_check_date %}
-                {{ last_check_date }}
+              {% if last_url_check.created_at %}
+                {{ last_url_check.created_at }}
+              {% endif %}
+            </td>
+            <td>
+              {% if last_url_check.status_code %}
+                {{ last_url_check.status_code }}
               {% endif %}
             </td>
           </tr>
