@@ -38,7 +38,7 @@ def index():
 def urls_show():
     urls = get_urls(conn)
     last_url_checks = [get_last_url_check(conn, url) for url in urls]
-    
+
     return render_template(
         'urls/index.html',
         data=zip_longest(urls, last_url_checks),
