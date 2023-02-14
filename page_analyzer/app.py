@@ -2,15 +2,23 @@ import os
 import psycopg2
 from dotenv import load_dotenv
 from flask import (
-    Flask, flash, get_flashed_messages, redirect,
-    render_template, request, url_for,
+    Flask,
+    flash,
+    get_flashed_messages,
+    redirect,
+    render_template,
+    request,
+    url_for,
 )
 from itertools import zip_longest
 
 from .db import (
-    check_url, get_last_url_check, get_status_code_by_url_name,
-    get_url_by_id, get_url_checks_by_url_id,
-    get_url_id_by_url_name, get_urls,
+    create_url_check,
+    get_last_url_check,
+    get_url_by_id,
+    get_url_checks_by_url_id,
+    get_url_id_by_url_name,
+    get_urls,
 )
 from .urls import normalize_url, validate
 
@@ -81,12 +89,6 @@ def get_url_details(id):
 @app.post('/urls/<int:id>/checks')
 def post_url_check(id):
     url = get_url_by_id(conn, id)
-    status_code = get_status_code_by_url_name(url.name)
-
-    if status_code:
-        check_url(conn, url, status_code)
-        flash('Страница успешно проверена', 'success')
-    else:
-        flash('Произошла ошибка при проверке', 'danger')
+    create_url_check(conn, url)
 
     return redirect(url_for('get_url_details', id=id))
