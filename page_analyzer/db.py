@@ -1,13 +1,14 @@
+import requests
 from flask import flash
 from psycopg2.extras import NamedTupleCursor
 
 
-def check_url(conn, url):
+def check_url(conn, url, status_code):
     with conn.cursor(cursor_factory=NamedTupleCursor) as curs:
         curs.execute(
-            'INSERT INTO url_checks (url_id, created_at)\
-            VALUES (%s, %s);',
-            (url.id, url.created_at),
+            'INSERT INTO url_checks (url_id, created_at, status_code)\
+            VALUES (%s, %s, %s);',
+            (url.id, url.created_at, status_code),
         )
         conn.commit()
 
@@ -23,6 +24,13 @@ def get_last_url_check_date(conn, url):
         last_check_date, = curs.fetchone()
 
     return last_check_date
+
+
+def get_status_code_by_url_name(url_name):
+    try:
+        return requests.get(url_name).status_code
+    except:
+        return
 
 
 def get_url_by_id(conn, url_id):
