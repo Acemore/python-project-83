@@ -66,7 +66,7 @@ def post_url():
             'index.html',
             url_name=url_name,
             messages=get_flashed_messages(with_categories=True),
-        )
+        ), 422
 
     normalized_url_name = normalize_url(url_name)
     id = get_url_id_by_url_name(conn, normalized_url_name)
