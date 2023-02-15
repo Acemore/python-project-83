@@ -8,7 +8,7 @@ from .soup import get_tags_data
 def create_url_check(conn, url):
     status_code = get_status_code_by_url_name(url.name)
 
-    if status_code:
+    if status_code == 200:
         tags_data = get_tags_data(url.name)
         with conn:
             with conn.cursor(cursor_factory=NamedTupleCursor) as curs:
