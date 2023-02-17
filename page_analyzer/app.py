@@ -32,7 +32,7 @@ app.secret_key = os.getenv('SECRET_KEY')
 conn = psycopg2.connect(app.database_url)
 
 
-@app.route('/', methods=['GET', 'POST'])
+@app.route('/')
 def index():
     messages = get_flashed_messages(with_categories=True)
 
@@ -55,7 +55,7 @@ def urls_show():
 
 @app.post('/urls')
 def post_url():
-    url_name = request.form.get('url', '')
+    url_name = request.form.get('url')
 
     errors = validate(url_name)
     if errors:
@@ -69,18 +69,16 @@ def post_url():
         ), 422
 
     normalized_url_name = normalize_url(url_name)
-    id = get_url_id_by_url_name(conn, normalized_url_name)
+    url_id = get_url_id_by_url_name(conn, normalized_url_name)
 
-    return redirect(url_for('get_url_details', id=id))
+    return redirect(url_for('get_url_details', id=url_id))
 
 
 @app.get('/urls/<int:id>')
 def get_url_details(id):
-    url = get_url_by_id(conn, id)
-
     return render_template(
         'urls/url.html',
-        url=url,
+        url=get_url_by_id(conn, id),
         url_checks=get_url_checks_by_url_id(conn, id),
         messages=get_flashed_messages(with_categories=True),
     )

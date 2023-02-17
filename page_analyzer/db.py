@@ -41,9 +41,9 @@ def get_last_url_check(conn, url):
                 ORDER BY id DESC;',
                 (url.id,),
             )
-            last_check = curs.fetchone()
+            last_url_check = curs.fetchone()
 
-    return last_check
+    return last_url_check
 
 
 def get_status_code_by_url_name(url_name):
@@ -94,7 +94,7 @@ def get_url_id_by_url_name(conn, url_name):
                 id = url_in_list_to_check.id
             else:
                 curs.execute(
-                    'INSERT INTO urls (name) VALUES (%s) RETURNING id',
+                    'INSERT INTO urls (name) VALUES (%s) RETURNING id;',
                     (url_name,),
                 )
                 id, = curs.fetchone()
