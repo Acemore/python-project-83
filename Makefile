@@ -12,4 +12,4 @@ lint:
 start:
 	poetry run gunicorn -w 5 -b 0.0.0.0:$(PORT) page_analyzer:app
 
-.PHONY: lint start
+.PHONY: install lint start
