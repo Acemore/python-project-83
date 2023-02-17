@@ -1,4 +1,5 @@
 import requests
+from datetime import datetime
 from flask import flash
 from psycopg2.extras import NamedTupleCursor
 
@@ -14,14 +15,15 @@ def create_url_check(conn, url):
             with conn.cursor(cursor_factory=NamedTupleCursor) as curs:
                 curs.execute(
                     'INSERT INTO url_checks\
-                    (url_id, status_code, h1, title, description)\
-                    VALUES (%s, %s, %s, %s, %s);',
+                    (url_id, status_code, h1, title, description, created_at)\
+                    VALUES (%s, %s, %s, %s, %s, %s);',
                     (
                         url.id,
                         status_code,
                         tags_data['h1'],
                         tags_data['title'],
                         tags_data['description'],
+                        datetime.now(),
                     ),
                 )
                 conn.commit()
@@ -94,8 +96,8 @@ def get_url_id_by_url_name(conn, url_name):
                 id = url_in_list_to_check.id
             else:
                 curs.execute(
-                    'INSERT INTO urls (name) VALUES (%s) RETURNING id;',
-                    (url_name,),
+                    'INSERT INTO urls (name, created_at) VALUES (%s, %s) RETURNING id;',
+                    (url_name, datetime.now()),
                 )
                 id, = curs.fetchone()
                 conn.commit()
