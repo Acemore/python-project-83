@@ -8,21 +8,20 @@ from .soup import get_tags_data
 def create_url_check(conn, url):
     status_code = get_status_code_by_url_name(url.name)
 
-    if status_code == 200:
+    if status_code < 400:
         tags_data = get_tags_data(url.name)
         with conn:
             with conn.cursor(cursor_factory=NamedTupleCursor) as curs:
                 curs.execute(
                     'INSERT INTO url_checks\
-                    (url_id, status_code, h1, title, description, created_at)\
-                    VALUES (%s, %s, %s, %s, %s, %s);',
+                    (url_id, status_code, h1, title, description)\
+                    VALUES (%s, %s, %s, %s, %s);',
                     (
                         url.id,
                         status_code,
                         tags_data['h1'],
                         tags_data['title'],
                         tags_data['description'],
-                        url.created_at,
                     ),
                 )
                 conn.commit()
@@ -51,7 +50,7 @@ def get_status_code_by_url_name(url_name):
     try:
         return requests.get(url_name).status_code
     except requests.RequestException:
-        return
+        return 404
 
 
 def get_url_by_id(conn, url_id):
