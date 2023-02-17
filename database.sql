@@ -1,7 +1,7 @@
 CREATE TABLE urls (
     id SERIAL PRIMARY KEY,
     name varchar(255) UNIQUE NOT NULL,
-    created_at date DEFAULT NOW()
+    created_at date
 );
 
 CREATE TABLE url_checks (
@@ -11,5 +11,5 @@ CREATE TABLE url_checks (
     h1 text,
     title text,
     description text,
-    created_at date DEFAULT NOW()
+    created_at date
 );
