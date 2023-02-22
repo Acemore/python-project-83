@@ -10,11 +10,11 @@ def normalize_url(url):
 def validate(url):
     errors = []
 
-    if len(url) > 255:
-        errors.append('URL превышает 255 символов')
-    if not is_correct_url(url):
-        errors.append('Некорректный URL')
     if not url:
         errors.append('URL обязателен')
+    elif len(url) > 255:
+        errors.append('URL превышает 255 символов')
+    elif not is_correct_url(url):
+        errors.append('Некорректный URL')
 
     return errors
