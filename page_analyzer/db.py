@@ -1,9 +1,9 @@
-import requests
 from datetime import datetime
 from flask import flash
 from psycopg2.extras import NamedTupleCursor
 
 from .soup import get_tags_data
+from .status_code import get_status_code_by_url_name
 
 
 def create_url_check(conn, url):
@@ -46,13 +46,6 @@ def get_last_url_check(conn, url):
             last_url_check = curs.fetchone()
 
     return last_url_check
-
-
-def get_status_code_by_url_name(url_name):
-    try:
-        return requests.get(url_name).status_code
-    except requests.RequestException:
-        return 404
 
 
 def get_url_by_id(conn, url_id):
