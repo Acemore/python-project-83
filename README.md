@@ -13,11 +13,32 @@ https://python-project-83-production-45c8.up.railway.app/
 
 ## To run Page Analyzer
 
+Install PostgreSQL locally if needed by this [instruction](https://github.com/Hexlet/ru-instructions/blob/main/postgresql.md)
+
+Start _postgresql_ service:
+
+```bash
+sudo service posgresql start
+```
+
+Execute this command to create db for this project:
+
+```bash
+createdb <db name>
+```
+
 Clone repo: 
 
 ```bash
 git clone git@github.com:Acemore/python-project-83.git
 ```
+
+Add db structure from project sql-file:
+
+```bash
+psql <db name> < database.sql
+```
+
 
 Create .env file in root project dir and add local environment variables:
 
