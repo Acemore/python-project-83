@@ -5,22 +5,24 @@ from flask import (
     Flask,
     flash,
     get_flashed_messages,
-    redirect,
     render_template,
     request,
-    url_for,
 )
-from itertools import zip_longest
 
 from .db import (
+    add_url,
     create_url_check,
-    get_last_url_check,
     get_url_by_id,
+    get_url_by_url_name,
     get_url_checks_by_url_id,
-    get_url_id_by_url_name,
-    get_urls,
+    get_urls_and_last_checks_data,
 )
-from .urls import normalize_url, validate
+from .web_utils import (
+    get_main_page_url,
+    get_redirect,
+    get_status_code_by_url_name,
+    validate,
+)
 
 load_dotenv()
 
@@ -44,12 +46,11 @@ def index():
 
 @app.get('/urls')
 def urls_show():
-    urls = get_urls(conn)
-    last_url_checks = [get_last_url_check(conn, url) for url in urls]
+    data = get_urls_and_last_checks_data(conn)
 
     return render_template(
         'urls/index.html',
-        data=zip_longest(urls, last_url_checks),
+        data=data,
     )
 
 
@@ -68,10 +69,17 @@ def post_url():
             messages=get_flashed_messages(with_categories=True),
         ), 422
 
-    normalized_url_name = normalize_url(url_name)
-    url_id = get_url_id_by_url_name(conn, normalized_url_name)
+    url_name = get_main_page_url(url_name)
+    url = get_url_by_url_name(conn, url_name)
 
-    return redirect(url_for('get_url_details', id=url_id))
+    if url:
+        flash('Страница уже существует', 'info')
+        id = url.id
+    else:
+        id = add_url(conn, url_name)
+        flash('Страница успешно добавлена', 'success')
+
+    return get_redirect('get_url_details', id)
 
 
 @app.get('/urls/<int:id>')
@@ -87,6 +95,12 @@ def get_url_details(id):
 @app.post('/urls/<int:id>/checks')
 def post_url_check(id):
     url = get_url_by_id(conn, id)
-    create_url_check(conn, url)
+    status_code = get_status_code_by_url_name(url.name)
 
-    return redirect(url_for('get_url_details', id=id))
+    if status_code and status_code < 400:
+        create_url_check(conn, url, status_code)
+        flash('Страница успешно проверена', 'success')
+    else:
+        flash('Произошла ошибка при проверке', 'danger')
+
+    return get_redirect('get_url_details', id)

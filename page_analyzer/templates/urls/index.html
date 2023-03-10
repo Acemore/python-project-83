@@ -15,20 +15,20 @@
           <th>Код ответа</th>
         </tr>
 
-        {% for url, last_url_check in data %}
+        {% for url_id, url_name, status_code, last_url_check_created_at in data %}
           <tr>
-            <td>{{ url.id }}</td>
+            <td>{{ url_id }}</td>
             <td>
-              <a href="{{ url_for('get_url_details', id=url.id) }}">{{ url.name }}</a>
+              <a href="{{ url_for('get_url_details', id=url_id) }}">{{ url_name }}</a>
             </td>
             <td>
-              {% if last_url_check.created_at %}
-                {{ last_url_check.created_at }}
+              {% if last_url_check_created_at %}
+                {{ last_url_check_created_at }}
               {% endif %}
             </td>
             <td>
-              {% if last_url_check.status_code %}
-                {{ last_url_check.status_code }}
+              {% if status_code %}
+                {{ status_code }}
               {% endif %}
             </td>
           </tr>
