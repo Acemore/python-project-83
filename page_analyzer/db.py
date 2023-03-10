@@ -1,59 +1,61 @@
 from datetime import datetime
-from flask import flash
 from psycopg2.extras import NamedTupleCursor
 
 from .soup import get_tags_data
-from .status_code import get_status_code_by_url_name
 
 
-def create_url_check(conn, url):
-    status_code = get_status_code_by_url_name(url.name)
-
-    if status_code < 400:
-        tags_data = get_tags_data(url.name)
-        with conn:
-            with conn.cursor(cursor_factory=NamedTupleCursor) as curs:
-                curs.execute(
-                    'INSERT INTO url_checks\
-                    (url_id, status_code, h1, title, description, created_at)\
-                    VALUES (%s, %s, %s, %s, %s, %s);',
-                    (
-                        url.id,
-                        status_code,
-                        tags_data['h1'],
-                        tags_data['title'],
-                        tags_data['description'],
-                        datetime.now(),
-                    ),
-                )
-                conn.commit()
-
-        flash('Страница успешно проверена', 'success')
-    else:
-        flash('Произошла ошибка при проверке', 'danger')
-
-
-def get_last_url_check(conn, url):
+def add_url(conn, url_name):
     with conn:
         with conn.cursor(cursor_factory=NamedTupleCursor) as curs:
             curs.execute(
-                'SELECT *\
-                FROM url_checks\
-                WHERE url_id = %s\
-                ORDER BY id DESC;',
-                (url.id,),
+                'INSERT INTO urls (name, created_at) VALUES (%s, %s) RETURNING id;',
+                (url_name, datetime.now()),
             )
-            last_url_check = curs.fetchone()
+            id, = curs.fetchone()
+            conn.commit()
 
-    return last_url_check
+    return id
+
+
+def create_url_check(conn, url, status_code):
+    tags_data = get_tags_data(url.name)
+
+    with conn:
+        with conn.cursor(cursor_factory=NamedTupleCursor) as curs:
+            curs.execute(
+                'INSERT INTO url_checks\
+                (url_id, status_code, h1, title, description, created_at)\
+                VALUES (%s, %s, %s, %s, %s, %s);',
+                (
+                    url.id,
+                    status_code,
+                    tags_data['h1'],
+                    tags_data['title'],
+                    tags_data['description'],
+                    datetime.now(),
+                ),
+            )
+            conn.commit()
 
 
 def get_url_by_id(conn, url_id):
     with conn:
         with conn.cursor(cursor_factory=NamedTupleCursor) as curs:
             curs.execute(
-                'SELECT * FROM urls WHERE id = %s;',
+                'SELECT * FROM urls WHERE id = %s LIMIT 1;',
                 (url_id,),
+            )
+            url = curs.fetchone()
+
+    return url
+
+
+def get_url_by_url_name(conn, url_name):
+    with conn:
+        with conn.cursor(cursor_factory=NamedTupleCursor) as curs:
+            curs.execute(
+                'SELECT * FROM urls WHERE name = %s LIMIT 1;',
+                (url_name,),
             )
             url = curs.fetchone()
 
@@ -75,34 +77,20 @@ def get_url_checks_by_url_id(conn, url_id):
     return url_checks
 
 
-def get_url_id_by_url_name(conn, url_name):
+def get_urls_and_last_checks_data(conn):
     with conn:
         with conn.cursor(cursor_factory=NamedTupleCursor) as curs:
             curs.execute(
-                'SELECT * FROM urls WHERE name = %s;',
-                (url_name,),
+                'SELECT DISTINCT ON (urls.id)\
+                    urls.id,\
+                    urls.name,\
+                    url_checks.status_code,\
+                    url_checks.created_at\
+                FROM urls\
+                LEFT JOIN url_checks\
+                ON urls.id = url_checks.url_id\
+                ORDER BY urls.id DESC, url_checks.created_at DESC;'
             )
-            url_in_list_to_check = curs.fetchone()
+            data = curs.fetchall()
 
-            if url_in_list_to_check:
-                flash('Страница уже существует', 'info')
-                id = url_in_list_to_check.id
-            else:
-                curs.execute(
-                    'INSERT INTO urls (name, created_at) VALUES (%s, %s) RETURNING id;',
-                    (url_name, datetime.now()),
-                )
-                id, = curs.fetchone()
-                conn.commit()
-                flash('Страница успешно добавлена', 'success')
-
-    return id
-
-
-def get_urls(conn):
-    with conn:
-        with conn.cursor(cursor_factory=NamedTupleCursor) as curs:
-            curs.execute('SELECT * FROM urls ORDER BY id DESC;')
-            urls = curs.fetchall()
-
-    return urls
+    return data
