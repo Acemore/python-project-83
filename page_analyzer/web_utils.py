@@ -15,7 +15,7 @@ def get_status_code_by_url(url):
         return 0
 
 
-def validate(url):
+def validate_url(url):
     errors = []
 
     if not url:

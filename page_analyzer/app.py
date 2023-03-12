@@ -52,7 +52,7 @@ def urls_show():
 def post_url():
     url_name = request.form.get('url')
 
-    errors = web_utils.validate(url_name)
+    errors = web_utils.validate_url(url_name)
     if errors:
         for error in errors:
             flash(error, 'danger')
