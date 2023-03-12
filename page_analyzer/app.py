@@ -5,8 +5,10 @@ from flask import (
     Flask,
     flash,
     get_flashed_messages,
+    redirect,
     render_template,
     request,
+    url_for,
 )
 
 from .db import (
@@ -19,7 +21,6 @@ from .db import (
 )
 from .web_utils import (
     get_main_page_url,
-    get_redirect,
     get_status_code_by_url_name,
     validate,
 )
@@ -32,6 +33,10 @@ app.database_url = os.getenv('DATABASE_URL')
 app.secret_key = os.getenv('SECRET_KEY')
 
 conn = psycopg2.connect(app.database_url)
+
+
+def get_redirect(handler_name, id):
+    return redirect(url_for(handler_name, id=id))
 
 
 @app.route('/')
