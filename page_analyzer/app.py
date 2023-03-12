@@ -35,7 +35,7 @@ app.secret_key = os.getenv('SECRET_KEY')
 conn = psycopg2.connect(app.database_url)
 
 
-def get_redirect(id):
+def get_redirect_to_url_details_page(id):
     return redirect(url_for('get_url_details', id=id))
 
 
@@ -84,7 +84,7 @@ def post_url():
         id = add_url(conn, url_name)
         flash('Страница успешно добавлена', 'success')
 
-    return get_redirect(id)
+    return get_redirect_to_url_details_page(id)
 
 
 @app.get('/urls/<int:id>')
@@ -108,4 +108,4 @@ def post_url_check(id):
     else:
         flash('Произошла ошибка при проверке', 'danger')
 
-    return get_redirect(id)
+    return get_redirect_to_url_details_page(id)

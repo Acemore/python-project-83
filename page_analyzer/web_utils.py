@@ -8,9 +8,9 @@ def get_main_page_url(url):
     return f'{parsed_url.scheme}://{parsed_url.netloc}'
 
 
-def get_status_code_by_url_name(url_name):
+def get_status_code_by_url(url):
     try:
-        return requests.get(url_name).status_code
+        return requests.get(url).status_code
     except requests.RequestException:
         return 0
 
