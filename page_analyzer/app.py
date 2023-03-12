@@ -11,8 +11,7 @@ from flask import (
     url_for,
 )
 
-from . import db
-from . import web_utils
+from . import db, web_utils
 from .soup import get_tags_data
 
 load_dotenv()
