@@ -1,8 +1,6 @@
 from datetime import datetime
 from psycopg2.extras import NamedTupleCursor
 
-from .soup import get_tags_data
-
 
 def add_url(conn, url_name):
     with conn:
@@ -17,9 +15,7 @@ def add_url(conn, url_name):
     return id
 
 
-def create_url_check(conn, url, status_code):
-    tags_data = get_tags_data(url.name)
-
+def create_url_check(conn, url, status_code, tags_data):
     with conn:
         with conn.cursor(cursor_factory=NamedTupleCursor) as curs:
             curs.execute(

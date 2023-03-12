@@ -19,6 +19,7 @@ from .db import (
     get_url_checks_by_url_id,
     get_urls_and_last_checks_data,
 )
+from .soup import get_tags_data
 from .web_utils import (
     get_main_page_url,
     get_status_code_by_url_name,
@@ -103,7 +104,9 @@ def post_url_check(id):
     status_code = get_status_code_by_url_name(url.name)
 
     if status_code and status_code < 400:
-        create_url_check(conn, url, status_code)
+        tags_data = get_tags_data(url.name)
+        create_url_check(conn, url, status_code, tags_data)
+
         flash('Страница успешно проверена', 'success')
     else:
         flash('Произошла ошибка при проверке', 'danger')
