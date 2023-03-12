@@ -33,7 +33,7 @@ Clone repo:
 git clone git@github.com:Acemore/python-project-83.git
 ```
 
-Add db structure from project sql-file:
+Create database tables:
 
 ```bash
 psql <db name> < database.sql
