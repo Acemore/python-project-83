@@ -11,20 +11,9 @@ from flask import (
     url_for,
 )
 
-from .db import (
-    add_url,
-    create_url_check,
-    get_url_by_id,
-    get_url_by_url_name,
-    get_url_checks_by_url_id,
-    get_urls_and_last_checks_data,
-)
+import db
+import web_utils
 from .soup import get_tags_data
-from .web_utils import (
-    get_main_page_url,
-    get_status_code_by_url_name,
-    validate,
-)
 
 load_dotenv()
 
@@ -52,7 +41,7 @@ def index():
 
 @app.get('/urls')
 def urls_show():
-    data = get_urls_and_last_checks_data(conn)
+    data = db.get_urls_and_last_checks_data(conn)
 
     return render_template(
         'urls/index.html',
@@ -64,7 +53,7 @@ def urls_show():
 def post_url():
     url_name = request.form.get('url')
 
-    errors = validate(url_name)
+    errors = web_utils.validate(url_name)
     if errors:
         for error in errors:
             flash(error, 'danger')
@@ -75,14 +64,14 @@ def post_url():
             messages=get_flashed_messages(with_categories=True),
         ), 422
 
-    url_name = get_main_page_url(url_name)
-    url = get_url_by_url_name(conn, url_name)
+    url_name = web_utils.get_main_page_url(url_name)
+    url = db.get_url_by_url_name(conn, url_name)
 
     if url:
         flash('Страница уже существует', 'info')
         id = url.id
     else:
-        id = add_url(conn, url_name)
+        id = db.add_url(conn, url_name)
         flash('Страница успешно добавлена', 'success')
 
     return get_redirect_to_url_details_page(id)
@@ -92,20 +81,20 @@ def post_url():
 def get_url_details(id):
     return render_template(
         'urls/url.html',
-        url=get_url_by_id(conn, id),
-        url_checks=get_url_checks_by_url_id(conn, id),
+        url=db.get_url_by_id(conn, id),
+        url_checks=db.get_url_checks_by_url_id(conn, id),
         messages=get_flashed_messages(with_categories=True),
     )
 
 
 @app.post('/urls/<int:id>/checks')
 def post_url_check(id):
-    url = get_url_by_id(conn, id)
-    status_code = get_status_code_by_url_name(url.name)
+    url = db.get_url_by_id(conn, id)
+    status_code = web_utils.get_status_code_by_url(url.name)
 
     if status_code and status_code < 400:
         tags_data = get_tags_data(url.name)
-        create_url_check(conn, url, status_code, tags_data)
+        db.create_url_check(conn, url, status_code, tags_data)
 
         flash('Страница успешно проверена', 'success')
     else:
