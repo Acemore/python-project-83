@@ -7,9 +7,7 @@
 
 ## Deployment
 
-**Page analyzer** is deployed on **Railway**:
-
-https://python-project-83-production-905f.up.railway.app/
+**Page analyzer** is deployed on [**Railway**](https://python-project-83-production-f487.up.railway.app/)
 
 ## To run Page Analyzer
 
